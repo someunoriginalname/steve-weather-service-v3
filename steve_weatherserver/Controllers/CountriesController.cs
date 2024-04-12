@@ -26,7 +26,11 @@ namespace steve_weatherserver.Controllers
         {
             return await _context.Countries.ToListAsync();
         }
-
+        [HttpGet("CountryCities/{id}")]
+        public async Task<ActionResult<IEnumerable<City>>> GetCitiesByCountry(int id)
+        {
+            return await _context.Cities.Where(c => c.CountryId == id).ToListAsync();
+        }
         // GET: api/Countries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(int id)
