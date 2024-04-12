@@ -82,7 +82,9 @@ namespace steve_weatherserver.Controllers
             var cities = _context.Cities
                     .AsNoTracking()
                     .ToDictionary(x => (
+                        
                         Name: x.Name,
+                        CityId: x.CityId,
                         Latitude: x.Latitude,
                         Longitude: x.Longitude,
                         Population: x.Population,
@@ -96,10 +98,12 @@ namespace steve_weatherserver.Controllers
                 var country = row[nRow, 5].GetValue<string>();
                 var lat = row[nRow, 3].GetValue<decimal>();
                 var lng = row[nRow, 4].GetValue<decimal>();
+                var cityid = row[nRow, 11].GetValue <int>();
                 var population = row[nRow, 10].GetValue<int>();
                 var countryid = countriesByName[country].CountryId;
                 if (cities.ContainsKey((
                     Name: name,
+                    CityId: cityid,
                     Latitude: lat,
                     Longitude: lng,
                     Population: population,
@@ -109,6 +113,7 @@ namespace steve_weatherserver.Controllers
                 var city = new City
                 {
                     Name = name,
+                    CityId = cityid,
                     Latitude = lat,
                     Longitude = lng,
                     Population = population,

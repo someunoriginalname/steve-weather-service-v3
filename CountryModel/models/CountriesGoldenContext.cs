@@ -79,7 +79,6 @@ public partial class CountriesGoldenContext : DbContext
             entity.HasIndex(e => e.Name, "IX_Country_Name");
 
             entity.Property(e => e.CountryId)
-                .ValueGeneratedNever()
                 .HasColumnName("CountryID");
             entity.Property(e => e.Iso2)
                 .IsUnicode(false)
