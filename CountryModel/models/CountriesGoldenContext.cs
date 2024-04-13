@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using CountryModel;
 using System;
-using CountryModel.models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CountryModel.models;
 
-public partial class CountriesGoldenContext : DbContext
+public partial class CountriesGoldenContext : IdentityDbContext<WorldCitiesUser>
 {
     public CountriesGoldenContext()
     {
@@ -37,6 +36,7 @@ public partial class CountriesGoldenContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<City>(entity =>
         {
             entity.HasKey(e => e.CityId).HasName("PK__Table__F2D21A965FAEB50E");

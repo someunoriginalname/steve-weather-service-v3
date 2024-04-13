@@ -18,6 +18,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System.IO;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace steve_weatherserver.Controllers
 {
@@ -28,12 +34,14 @@ namespace steve_weatherserver.Controllers
        
         private readonly CountriesGoldenContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly UserManager<WorldCitiesUser> _userManager;
         public SeedController(
             CountriesGoldenContext context,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env, UserManager<WorldCitiesUser> userManager)
         {
             _context = context;
             _env = env;
+            _userManager = userManager;
         }
         [HttpGet]
         public async Task<ActionResult> Import()
@@ -130,5 +138,46 @@ namespace steve_weatherserver.Controllers
                 Countries = countryCount
             });
         }
+        [HttpPost("User")]
+        public async Task<ActionResult> SeedUsers()
+        {
+            (string name, string email) = ("user1", "comp584@csun.edu");
+            WorldCitiesUser user = new()
+            {
+                UserName = name,
+                Email = email,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+            if (await _userManager.FindByNameAsync(name) is not null)
+            {
+                user.UserName = "user2";
+            }
+            _ = await _userManager.CreateAsync(user, "P@ssw0rd!")
+                ?? throw new InvalidOperationException();
+            user.EmailConfirmed = true;
+            user.LockoutEnabled = false;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+        public async Task<JwtSecurityToken> GetTokenAsync(WorldCitiesUser user) =>
+        new(
+            issuer: configuration["JwtSettings:Issuer"],
+            audience: configuration["JwtSettings:Audience"],
+            claims: await GetClaimsAsync(user),
+            expires: DateTime.Now.AddMinutes(Convert.ToDouble(configuration["JwtSettings:ExpirationTimeInMinutes"])),
+            signingCredentials: GetSigningCredentials());
+
+    private SigningCredentials GetSigningCredentials() {
+        byte[] key = Encoding.UTF8.GetBytes(configuration["JwtSettings:SecurityKey"]!);
+        SymmetricSecurityKey secret = new(key);
+        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+    }
+
+    private async Task<List<Claim>> GetClaimsAsync(WorldCitiesUser user) {
+        List<Claim> claims = [new Claim(ClaimTypes.Name, user.UserName!)];
+        claims.AddRange(from role in await userManager.GetRolesAsync(user) select new Claim(ClaimTypes.Role, role));
+        return claims;
+    } 
     }
 }

@@ -9,6 +9,7 @@ using CountryModel;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Reflection.Metadata.Ecma335;
 using CountryModel.models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WeatherServer.Controllers
 {
@@ -23,8 +24,7 @@ namespace WeatherServer.Controllers
             {
                 return await context.Cities.ToListAsync();
             }
-
-        // GET: api/Cities
+        [Authorize]
         [HttpGet("GetPopulation")]
         public async Task<ActionResult<IEnumerable<CountryPopulation>>> GetPopulation()
         {
@@ -38,7 +38,6 @@ namespace WeatherServer.Controllers
             return await x.ToListAsync();
         }
 
-        // GET: api/Cities
         [HttpGet("GetPopulation2")]
         public async Task<ActionResult<IEnumerable<CountryPopulation>>> GetPopulation2()
         {
