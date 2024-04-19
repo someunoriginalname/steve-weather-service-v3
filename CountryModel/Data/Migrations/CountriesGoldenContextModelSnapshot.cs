@@ -25,15 +25,10 @@ namespace CountryModel.Data.Migrations
             modelBuilder.Entity("CountryModel.models.City", b =>
                 {
                     b.Property<int>("CityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("CityID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CityId"));
+                        .HasColumnType("int");
 
                     b.Property<int>("CountryId")
-                        .HasColumnType("int")
-                        .HasColumnName("CountryID");
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Latitude")
                         .HasColumnType("numeric(18, 4)");
@@ -43,16 +38,16 @@ namespace CountryModel.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
+                        .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("char(30)")
+                        .HasColumnType("char(100)")
                         .IsFixedLength();
 
                     b.Property<int>("Population")
                         .HasColumnType("int");
 
                     b.HasKey("CityId")
-                        .HasName("PK__Table__F2D21A965FAEB50E");
+                        .HasName("PK_Game");
 
                     b.HasIndex("Latitude");
 
@@ -62,15 +57,15 @@ namespace CountryModel.Data.Migrations
 
                     b.HasIndex("Population");
 
-                    b.HasIndex(new[] { "CountryId" }, "IX_City_CountryID");
+                    b.HasIndex(new[] { "Longitude" }, "IX_Game_Players");
 
-                    b.HasIndex(new[] { "Latitude" }, "IX_City_Latitude");
+                    b.HasIndex(new[] { "Latitude" }, "IX_Game_Price");
 
-                    b.HasIndex(new[] { "Longitude" }, "IX_City_Longitude");
+                    b.HasIndex(new[] { "CountryId" }, "IX_Game_PublisherID");
 
-                    b.HasIndex(new[] { "Name" }, "IX_City_Name");
+                    b.HasIndex(new[] { "Name" }, "IX_Game_Revenue");
 
-                    b.HasIndex(new[] { "Population" }, "IX_City_Population");
+                    b.HasIndex(new[] { "Population" }, "IX_Game_Year");
 
                     b.ToTable("City", (string)null);
                 });
@@ -79,8 +74,7 @@ namespace CountryModel.Data.Migrations
                 {
                     b.Property<int>("CountryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("CountryID");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"));
 
@@ -92,6 +86,7 @@ namespace CountryModel.Data.Migrations
 
                     b.Property<string>("Iso3")
                         .IsRequired()
+                        .HasMaxLength(900)
                         .IsUnicode(false)
                         .HasColumnType("char(900)")
                         .IsFixedLength();
@@ -102,7 +97,8 @@ namespace CountryModel.Data.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(400)");
 
-                    b.HasKey("CountryId");
+                    b.HasKey("CountryId")
+                        .HasName("PK_Publisher");
 
                     b.HasIndex("Iso2");
 
@@ -110,11 +106,7 @@ namespace CountryModel.Data.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex(new[] { "Iso2" }, "IX_Country_Iso2");
-
-                    b.HasIndex(new[] { "Iso3" }, "IX_Country_Iso3");
-
-                    b.HasIndex(new[] { "Name" }, "IX_Country_Name");
+                    b.HasIndex(new[] { "Iso2" }, "IX_Publisher_PublisherName");
 
                     b.ToTable("Country", (string)null);
                 });
@@ -323,7 +315,7 @@ namespace CountryModel.Data.Migrations
                         .WithMany("Cities")
                         .HasForeignKey("CountryId")
                         .IsRequired()
-                        .HasConstraintName("FK_City_Country");
+                        .HasConstraintName("FK_Game_Publisher");
 
                     b.Navigation("Country");
                 });

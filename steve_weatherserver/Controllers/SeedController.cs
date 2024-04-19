@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,21 +9,14 @@ using CountryModel.models;
 using CsvHelper.Configuration;
 using System.Globalization;
 using CsvHelper;
-using steve_weatherserver.Controllers;
-using Microsoft.Extensions.Hosting;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using System.Security.Policy;
-using System.Security;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using System.IO;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+
 
 namespace steve_weatherserver.Controllers
 {
@@ -43,11 +36,10 @@ namespace steve_weatherserver.Controllers
             _env = env;
             _userManager = userManager;
         }
+        
         [HttpGet]
         public async Task<ActionResult> Import()
         {
-            if (!_env.IsDevelopment())
-                throw new SecurityException("Not allowed");
             var path = Path.Combine(
                 _env.ContentRootPath,
                 "Data/worldcities.xlsx");
@@ -139,7 +131,7 @@ namespace steve_weatherserver.Controllers
             });
         }
         [HttpPost("User")]
-        public async Task<ActionResult> SeedUsers()
+        public async Task<ActionResult> SeedUser()
         {
             (string name, string email) = ("user1", "comp584@csun.edu");
             WorldCitiesUser user = new()
@@ -159,25 +151,7 @@ namespace steve_weatherserver.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+
         }
-        public async Task<JwtSecurityToken> GetTokenAsync(WorldCitiesUser user) =>
-        new(
-            issuer: configuration["JwtSettings:Issuer"],
-            audience: configuration["JwtSettings:Audience"],
-            claims: await GetClaimsAsync(user),
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(configuration["JwtSettings:ExpirationTimeInMinutes"])),
-            signingCredentials: GetSigningCredentials());
-
-    private SigningCredentials GetSigningCredentials() {
-        byte[] key = Encoding.UTF8.GetBytes(configuration["JwtSettings:SecurityKey"]!);
-        SymmetricSecurityKey secret = new(key);
-        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-    }
-
-    private async Task<List<Claim>> GetClaimsAsync(WorldCitiesUser user) {
-        List<Claim> claims = [new Claim(ClaimTypes.Name, user.UserName!)];
-        claims.AddRange(from role in await userManager.GetRolesAsync(user) select new Claim(ClaimTypes.Role, role));
-        return claims;
-    } 
     }
 }

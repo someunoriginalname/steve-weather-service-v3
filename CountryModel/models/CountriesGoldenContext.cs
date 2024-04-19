@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using System;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CountryModel.models;
 
@@ -39,51 +37,47 @@ public partial class CountriesGoldenContext : IdentityDbContext<WorldCitiesUser>
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<City>(entity =>
         {
-            entity.HasKey(e => e.CityId).HasName("PK__Table__F2D21A965FAEB50E");
+            entity.HasKey(e => e.CityId).HasName("PK_Game");
 
             entity.ToTable("City");
 
-            entity.HasIndex(e => e.CountryId, "IX_City_CountryID");
+            entity.HasIndex(e => e.Longitude, "IX_Game_Players");
 
-            entity.HasIndex(e => e.Latitude, "IX_City_Latitude");
+            entity.HasIndex(e => e.Latitude, "IX_Game_Price");
 
-            entity.HasIndex(e => e.Longitude, "IX_City_Longitude");
+            entity.HasIndex(e => e.CountryId, "IX_Game_PublisherID");
 
-            entity.HasIndex(e => e.Name, "IX_City_Name");
+            entity.HasIndex(e => e.Name, "IX_Game_Revenue");
 
-            entity.HasIndex(e => e.Population, "IX_City_Population");
+            entity.HasIndex(e => e.Population, "IX_Game_Year");
 
-            entity.Property(e => e.CityId).HasColumnName("CityID");
-            entity.Property(e => e.CountryId).HasColumnName("CountryID");
+            entity.Property(e => e.CityId).ValueGeneratedNever();
             entity.Property(e => e.Latitude).HasColumnType("numeric(18, 4)");
             entity.Property(e => e.Longitude).HasColumnType("numeric(18, 4)");
             entity.Property(e => e.Name)
-                .HasMaxLength(30)
+                .HasMaxLength(100)
                 .IsUnicode(false)
                 .IsFixedLength();
 
             entity.HasOne(d => d.Country).WithMany(p => p.Cities)
                 .HasForeignKey(d => d.CountryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_City_Country");
+                .HasConstraintName("FK_Game_Publisher");
         });
 
         modelBuilder.Entity<Country>(entity =>
         {
+            entity.HasKey(e => e.CountryId).HasName("PK_Publisher");
+
             entity.ToTable("Country");
 
-            entity.HasIndex(e => e.Iso2, "IX_Country_Iso2");
+            entity.HasIndex(e => e.Iso2, "IX_Publisher_PublisherName");
 
-            entity.HasIndex(e => e.Iso3, "IX_Country_Iso3");
-
-            entity.HasIndex(e => e.Name, "IX_Country_Name");
-
-            entity.Property(e => e.CountryId)
-                .HasColumnName("CountryID");
             entity.Property(e => e.Iso2)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Iso3)
+                .HasMaxLength(900)
                 .IsUnicode(false)
                 .IsFixedLength();
             entity.Property(e => e.Name)
