@@ -101,7 +101,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
-
+app.UseRouting();
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();

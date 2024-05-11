@@ -38,9 +38,9 @@ namespace WeatherServer.Controllers
             string jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
             return Ok(new LoginResult
             {
-                Success = true,
-                Message = "Welcome",
-                Token = jwtToken
+                success = true,
+                message = "Welcome",
+                token = jwtToken
             });
         }
     }
